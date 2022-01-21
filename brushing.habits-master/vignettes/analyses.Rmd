@@ -1,0 +1,357 @@
+---
+title: "Brushing model 1"
+output:
+  pdf_document: default
+  html_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Objective
+
+We want to analyze variations in the amount of time spent brushing each dental region,
+session-to-session and among participants.
+
+In particular, we want to know whether the participants spent more time brushing their lower teeth
+than upper teeth, left versus right, and inner (lingual) versus outer (buccal) surfaces.
+
+```{r, "Load data"}
+
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(papeR)
+library(brushing.habits)
+library(lme4)
+library(plotly)
+
+```
+
+# Figure 4
+
+```{r}
+
+fig4 = plot_ly(
+  data = session_durations,
+  y = ~`Session duration (seconds)`,
+  type = "box",
+  color = ~factor(Participant)
+  
+) %>% 
+  hide_legend() %>%
+  layout(xaxis = list(title = "Participant number"))  %>%
+  print()
+
+
+```
+
+```{r}
+
+fig4b = plot_ly(
+  data = session_durations2,
+  y = ~`Session duration (seconds)`,
+  type = "box",
+  color = ~factor(Participant)
+  
+) %>% 
+  layout(xaxis = list(title = "Participant number"),
+         yaxis = list(rangemode = "tozero"))  %>%
+  hide_legend() %>%
+  print()
+
+
+```
+
+# Figure 5
+
+```{r}
+
+fig5 = plot_ly(
+  data = region_durations,
+  y = ~`Duration (seconds)`,
+  type = "box",
+  color = ~Region
+  
+) %>% 
+  layout(xaxis = list(title = "Region"))  %>%
+  hide_legend() %>%
+  print()
+
+
+```
+
+# Fig 11
+
+```{r}
+
+fig11 = plot_ly(
+  data = pressure_durations,
+  y = ~`Duration (seconds)`,
+  type = "box",
+  color = ~Region
+  
+) %>% 
+  layout(xaxis = list(title = "Region"))  %>%
+  hide_legend() %>%
+  print()
+```
+
+
+
+
+
+Here we fit a Poisson regression model for the amount of time spent brushing each session.
+
+$$P(Y_{ijk}=y) = \frac{\lambda_{ijk}^y exp(\lambda_{ijk})}{y!}$$
+
+$$\log(\lambda_{ijk}) = \beta_0 + ...$$
+
+```{r}
+
+library("lme4")
+lmer1 = glmer(
+  formula = offset(session_length) + n_samples ~ Surface + Side + Maxillar + (1|Participant), 
+  # formula = n_samples ~ Surface + Side + Maxillar + (1|Session / Participant), 
+  # data = data2 %>% filter(!is.element(Participant, c(7,12))), 
+  data  = data2,
+  family = "poisson")
+summary(lmer1)
+
+lmer2 = glmer(
+  formula =  n_samples ~ Surface + Side + Maxillar + (1|Participant), 
+  # formula = n_samples ~ Surface + Side + Maxillar + (1|Session / Participant), 
+  # data = data2 %>% filter(!is.element(Participant, c(7,12))), 
+  data  = data2,
+  family = "poisson")
+summary(lmer2)
+
+
+maxillar_coef = coef(summary(lmer1))["MaxillarTRUE", "Estimate"]
+```
+
+Based on this model, we estimate that our participants spent `r exp(maxillar_coef)` times as long brushing maxillar teeth than they spent brushing their mandibular teeth.
+
+
+```{r}
+lmer2 = glmer(
+  formula = n_samples ~ Surface + Side + Maxillar + (1| Participant / Session),
+  data  = region_durations %>% mutate(Side = factor(Side, levels = c("Right", "Left", "Anterior"))),
+  family = "poisson")
+summary(lmer2)
+ranefs2 = ranef(lmer2)
+
+```
+
+```{r}
+
+lmer2 = glmer(
+  formula = n_samples ~ Surface + Side + Maxillar + (1| Participant / Session),
+  data  = data2 %>% mutate(Side = factor(Side, levels = c("Right", "Left", "Anterior"))),
+  family = "poisson")
+
+n_bootstraps = 1000
+coefs_table = matrix(nrow = n_bootstraps, ncol = length(fixef(lmer2)))
+colnames(coefs_table) = names(fixef(lmer2))
+
+n_participants = length(unique(data2$Participant))
+
+for (i in 1:n_bootstraps)
+{
+  message("starting bootstrap ", i)
+  boot_data = NULL
+  
+  for (j in 1:n_participants)
+  {
+    
+    cur_participant = sample(x = 1:n_participants, size = 1)
+    n_sessions = nrow(session_durations %>% filter(Participant == cur_participant))
+    
+    for (k in 1:n_sessions)
+    {
+      
+      sampled_session_number = sample(x = 1:n_sessions, size = 1)
+      
+      sampled_session = 
+        data2 %>% 
+        filter(
+          Participant == cur_participant, 
+          Session == sampled_session_number) %>%
+        mutate(
+          Participant = j, 
+          source = paste(cur_participant, sampled_session_number),
+          Session = k)
+      
+      boot_data %<>% bind_rows(sampled_session)
+      
+    }
+    
+  }
+  
+  lmer2_boot = glmer(
+    formula = n_samples ~ Surface + Side + Maxillar + (1| Participant / Session),
+    data  = boot_data %>% mutate(Side = factor(Side, levels = c("Right", "Left", "Anterior"))),
+    family = "poisson")
+  
+  
+  coefs_table[i, ] = fixef(lmer2_boot)
+  
+}
+
+SEs = apply(M = 2, X = coefs_table, F = sd)
+CIs_low = apply(M = 2, X = coefs_table, F = quantile, p = .025)
+CIs_high = apply(M = 2, X = coefs_table, F = quantile, p = .975)
+
+```
+
+
+# all coefs participant-specific:
+
+```{r}
+
+lmer3 = glmer(
+  formula = n_samples ~ Surface + Side + Maxillar + (1 + Surface + Maxillar + Side | Participant) + (1 | Session:Participant),
+  data  = data2 %>% mutate(Side = relevel(factor(Side), ref = "Right")),
+  family = "poisson")
+summary(lmer3)
+ranefs3 = ranef(lmer3)
+temp = coef(summary(lmer3))["SideRight", "Estimate"] 
+hist((ranefs3$Participant$SideRight + temp), breaks = 20)
+```
+
+# coef for every region
+
+
+```{r}
+
+lmer4 = glmer(
+  formula = n_samples ~ Region -1 + (1 | Participant / Session),
+  data  = data2,
+  family = "poisson")
+
+summary(lmer4)
+
+
+```
+
+
+```{r}
+ # this model fails to converge
+lmer3b = glmer(
+  formula = n_samples ~ Surface + Side + Maxillar + 
+    (Surface  | Participant) + 
+    (Maxillar  | Participant) + 
+    (Side | Participant) + 
+    (1 | Participant / Session),
+  data  = data2,
+  family = "poisson")
+summary(lmer3b)
+```
+
+
+```{r}
+lmer3b = glmer(
+  formula = n_samples ~ Surface + Side + Maxillar + (Surface | Participant)  + (Side | Participant) + (Maxillar | Participant) + (1| Session:Participant),
+  data  = data2,
+  family = "poisson")
+summary(lmer3b)
+```
+
+# Graphics
+
+```{r}
+
+data2 %<>% mutate(
+  pct_of_session = n_samples / session_length
+)
+
+hist(data2$n_samples, breaks = 100)
+hist(data2$n_samples[data2$n_samples!=0], breaks = 100)
+
+manRB = data2 %>% filter(Region == "ManRB")
+
+hist(manRB$pct_of_session, breaks = 50, xlim = c(0, .2))
+hist(data2$pct_of_session[data2$pct_of_session!=0], breaks = 50, xlim = c(0, .2))
+
+```
+
+# overall brushing duration
+
+
+## boxplot of overall brushing
+
+from Ramin, re: matlab:
+
+boxplot draws points as outliers if they are greater than q3 + w × (q3 – q1) or less than q1 – w × (q3 – q1), where w is the multiplier Whisker, and q1 and q3 are the 25th and 75th percentiles of the sample data, respectively.
+
+The default value for 'Whisker' corresponds to approximately +/–2.7σ and 99.3 percent coverage if the data are normally distributed. The plotted whisker extends to the adjacent value, which is the most extreme data value that is not an outlier.
+
+I used the defual which is 1.5
+defual whisker value
+
+
+```{r}
+
+library(ggplot2)
+library(hrbrthemes)
+library(viridis)
+
+ggplot(
+  data = session_durations,
+  aes(group = Participant,
+      y = `Session duration (seconds)`)) +
+  geom_boxplot() +
+  expand_limits(y = 0)
+
+boxplot(`Session duration (seconds)` ~ Participant, 
+        data = session_durations, 
+        ylim = c(0,160))
+
+
+averages = session_durations %>% group_by(Participant) %>%
+  dplyr::summarise(
+    median = median(`Session duration (seconds)`),
+    mean = mean(`Session duration (seconds)`))
+```
+
+## model
+```{r}
+library(lme4)
+glm_SL = glmer(
+  formula = `Session duration (samples)` ~ (1|Participant),
+  data  = session_durations,
+  family = "poisson")
+summary(glm_SL)
+
+library(papeR)
+confint(glm_SL)
+p1 = session_durations %>% filter(Participant == 1)
+median(p1$session_length/25)
+```
+
+# analysis of within-person variation in session duration
+
+```{r}
+
+# here are the participant-specific SD(duration) and sqrt(mean(duration):
+session_durations %>% 
+  group_by(Participant) %>% 
+  dplyr::summarize(
+    sd = sd(`Session duration (seconds)`), 
+    sqrt.mean = sqrt(mean(`Session duration (seconds)`)))
+# the actual sds are actually larger than the square roots of the means, indicating overdispersion (not surprising)
+
+# here's the mean of the participant-specific sds:
+session_durations %>% 
+  group_by(Participant) %>% 
+  dplyr::summarize(
+    sd = sd(`Session duration (seconds)`), 
+    sqrt.mean = sqrt(mean(`Session duration (seconds)`))) %>%
+  dplyr::summarize(mean.sd = mean(sd))
+
+# the mean of the participant specific SDs is 12.9, which is slightly larger than sqrt(120) ~= 10.95
+```
+

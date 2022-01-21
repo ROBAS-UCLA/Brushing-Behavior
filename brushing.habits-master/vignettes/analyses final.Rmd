@@ -1,0 +1,295 @@
+---
+title: "Brushing model 1"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+# Objective
+
+We want to analyze variations in the amount of time spent brushing each dental region,
+session-to-session and among participants.
+
+In particular, we want to know whether the participants spent more time brushing their lower teeth
+than upper teeth, left versus right, and inner (lingual) versus outer (buccal) surfaces.
+
+```{r, "Load data", include = FALSE}
+
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(papeR)
+library(brushing.habits)
+library(lme4)
+library(plotly)
+library(pander)
+library(broom.mixed)
+library(glmmTMB)
+library("bbmle")
+library(sjPlot)
+library(parameters)
+
+panderOptions('digits', 3)
+panderOptions('table.split.table', Inf)
+
+```
+
+# Model for brushing duration per region
+
+```{r}
+
+fit0 = glmmTMB(
+  family = "poisson",
+  data  = region_durations,
+  formula = n_samples ~ Surface + Side + Jaw + (1 + Surface + Jaw + Side | Participant) + (1 | Participant:Session),
+  ziformula = ~ 0
+)
+
+fit1 = update(fit0, ziformula = ~ 1)
+fit2 = update(fit1, ziformula = ~ Surface + Side + Jaw)
+fit3 = update(fit2, ziformula = ~ Surface + Side + Jaw + (1 | Participant))
+fit4 = update(fit3, ziformula = ~ Surface + Side + Jaw + (1 | Participant / Session))
+
+# doesn't converge:
+# fit5 = update(fit3, ziformula = ~ Surface + Side + Jaw + (1 + Surface + Jaw + Side | Participant) + (1 | Participant / Session))
+
+
+fit3nb = update(fit3, family = nbinom2)
+fit4nb = update(fit4, family = nbinom2)
+fit5nb = update(fit4nb, dispformula = ~ 0 + factor(Participant))
+
+
+aics = AICtab(
+  fit3nb, fit4nb, fit5nb,
+  fit0, fit1, fit2,
+  fit3,
+  fit4)
+
+bics = BICtab(
+  fit3nb, fit4nb,fit5nb,
+  fit0, fit1, fit2,
+  fit3,
+  fit4)
+
+region_chosen = fit5nb
+
+aic_chosen = AIC(region_chosen)
+aic_poisson = AIC(fit4)
+bic_chosen =  BIC(region_chosen)
+bic_poisson = BIC(fit4)
+
+
+diff_aic = aic_poisson - aic_chosen
+diff_bic = bic_poisson - bic_chosen
+
+# The AIC for this model was `r format(aic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_aic, scientific = Inf, big.mark = ",")` less than a zero-inflated Poisson model with the same fixed and random effects. The BIC for this model was `r format(bic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_bic, scientific = Inf, big.mark = ",")` less than the zero-inflated Poisson model with the same fixed and random effects.
+```
+
+Here we fit a zero-inflated negative binomial regression model for the amount of time (measured in counts of 25 Hz samples) spent brushing each region, 
+with a log-link for the count submodel and a logistic link for the zero-inflation submodel.
+Both submodels had fixed effects for tooth surface, mouth side, and jaw,
+and random effects on the intercept by session nested in participant, to account for person-to-person and session-to-session variability in overall brushing duration.
+The count submodel also included participant-specific random effects for tooth surface, mouth side, and jaw.
+We attempted to add participant-specific random effects for tooth surface, mouth side, and jaw in the zero-inflation submodel, but the estimation algorithm failed to converge for that extended model. 
+
+The AIC for this model was `r format(aic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_aic, scientific = Inf, big.mark = ",")` less than a zero-inflated Poisson model with the same fixed and random effects. The BIC for this model was `r format(bic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_bic, scientific = Inf, big.mark = ",")` less than the zero-inflated Poisson model with the same fixed and random effects.
+
+## Parameter estimates:
+
+
+```{r,results = "asis"}
+
+# a = tab_model(fit4, show.icc = FALSE, show.re.var = TRUE, show.se = TRUE, show.ngroups = FALSE, show.obs = FALSE, show.r2 = FALSE, transform = NULL)
+# coef(summary(fit4))$cond %>%
+#   format_fixef_table %>%
+#   pander()
+
+# this argument is used in parameters:::.prepare_x_for_print
+to_print = c("Parameter", "Coefficient", 
+             "SE",
+             "CI", "CI_low", "CI_high", "p")
+parameters(region_chosen) %>% print_md(select = to_print)
+
+# VarCorr(fit0)
+```
+
+### Estimates of participant-level random effects for count submodel:
+
+```{R}
+
+region_chosen %>% format_ranef_table(comp = "cond", combine_stats = FALSE) %>% pander()
+
+```
+
+### Estimates of participant-level random effects for zero-inflation submodel:
+
+```{R}
+
+region_chosen %>% format_ranef_table(comp = "zi", combine_stats = FALSE) %>% pander()
+
+```
+
+
+# Brushing duration with excessive pressure
+
+Again, we fit a zero-inflated negative binomial model; both the zero-inflation and count submodels include 
+fixed effects for tooth surface, side, and jaw, and random effects on the intercept by participant and session.
+An extended model with participant-level random effects on tooth surface, side, and jaw failed to converge.
+
+```{r}
+
+# this creates a convergence problem:
+# pressure_durations %<>% pressure_durations  %>% mutate(Surface = relevel(factor(Surface), ref = "Occlusal"))
+pressure1 = glmmTMB(
+  family = nbinom2,
+  data  = pressure_durations,
+  # formula = n_samples ~ Surface + Side + Jaw + (1 + Surface + Jaw + Side | Participant) + (1 | Session:Participant),
+  formula = n_samples ~ Surface + Side + Jaw + (1 | Participant / Session),
+  ziformula = ~ Surface + Side + Jaw + (1 | Participant / Session),
+  dispformula = ~ 1)
+
+pressure_pois = glmmTMB(
+  family = poisson,
+  data  = pressure_durations,
+  # formula = n_samples ~ Surface + Side + Jaw + (1 + Surface + Jaw + Side | Participant) + (1 | Session:Participant),
+  formula = n_samples ~ Surface + Side + Jaw + (1 | Participant / Session),
+  ziformula = ~ Surface + Side + Jaw + (1 | Participant / Session))
+
+
+aic_chosen = AIC(pressure1)
+aic_poisson = AIC(pressure_pois)
+bic_chosen =  BIC(pressure1)
+bic_poisson = BIC(pressure_pois)
+
+
+diff_aic = aic_poisson - aic_chosen
+diff_bic = bic_poisson - bic_chosen
+
+# The AIC for this model was `r format(aic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_aic, scientific = Inf, big.mark = ",")` less than a zero-inflated Poisson model with the same fixed and random effects. The BIC for this model was `r format(bic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_bic, scientific = Inf, big.mark = ",")` less than the zero-inflated Poisson model with the same fixed and random effects.
+```
+
+The AIC for this model was `r format(aic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_aic, scientific = Inf, big.mark = ",")` less than a zero-inflated Poisson model with the same fixed and random effects. The BIC for this model was `r format(bic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_bic, scientific = Inf, big.mark = ",")` less than the zero-inflated Poisson model with the same fixed and random effects.
+
+## Parameter Estimates
+
+```{r}
+
+parameters(pressure1) %>% print_md(select = to_print)
+```
+
+
+### Estimates of participant-level random effects for count submodel:
+
+```{R}
+
+pressure1 %>% format_ranef_table(comp = "cond", combine_stats = FALSE) %>% pander()
+
+```
+
+### Estimates of participant-level random effects for zero-inflation submodel:
+
+```{R}
+
+pressure1 %>% format_ranef_table(comp = "zi", combine_stats = FALSE) %>% pander()
+
+```
+
+# Total duration of brushing
+
+Here we fit a negative binomial regression model for the total duration of each brushing session (again measured in counts of 25 Hz samples),
+with a log-link, random intercepts by participant, and person-specific dispersion parameters (modeled as fixed effects due to the limitations of the modeling package).
+
+```{r}
+
+td_poisson = glmmTMB(
+  family = poisson,
+  data  = session_durations2,
+  formula = n_samples ~ (1 | Participant))
+
+td_poisson2 = glmmTMB(
+  family = poisson,
+  data  = session_durations2,
+  formula = n_samples ~ (1 | Participant / Session))
+
+
+td_nbinom1 = glmmTMB(
+  family = nbinom2,
+  data  = session_durations2,
+  formula = n_samples ~ (1 | Participant),
+  dispformula = ~ 1)
+
+td_nbinom2 = glmmTMB(
+  family = nbinom2,
+  data  = session_durations2,
+  formula = n_samples ~ (1 | Participant),
+  dispformula = ~ factor(Participant) + 0)
+
+aics = AICtab(td_poisson, td_poisson2, td_nbinom1, td_nbinom2)
+bics = BICtab(td_poisson, td_poisson2, td_nbinom1, td_nbinom2)
+
+chosen_model = td_nbinom2
+
+
+aic_chosen = AIC(chosen_model)
+aic_poisson = AIC(td_poisson)
+bic_chosen =  BIC(chosen_model)
+bic_poisson = BIC(td_poisson)
+
+
+diff_aic = aic_poisson - aic_chosen
+diff_bic = bic_poisson - bic_chosen
+
+# The AIC for this model was `r format(aic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_aic, scientific = Inf, big.mark = ",")` less than a zero-inflated Poisson model with the same fixed and random effects. The BIC for this model was `r format(bic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_bic, scientific = Inf, big.mark = ",")` less than the zero-inflated Poisson model with the same fixed and random effects.
+
+```
+
+The AIC for this model was `r format(aic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_aic, scientific = Inf, big.mark = ",")` less than a zero-inflated Poisson model with the same fixed and random effects. The BIC for this model was `r format(bic_chosen, scientific = Inf, big.mark = ",")`, which was `r format(diff_bic, scientific = Inf, big.mark = ",")` less than the zero-inflated Poisson model with the same fixed and random effects.
+
+## Parameter estimates
+
+```{r}
+parameters(chosen_model) %>% 
+  print_md(select = to_print)
+
+```
+
+
+### Estimates of participant-level random effects:
+
+```{R}
+
+chosen_model %>% format_ranef_table(comp = NULL, combine_stats = FALSE) %>% pander()
+
+```
+
+Here is a table of participant-specific estimates:
+
+```{r}
+### within-person variability
+
+temp = 
+  session_durations2 %>% 
+  group_by(Participant) %>% 
+  summarise(
+    `sample mean (seconds)` = mean(n_samples) / 25,
+    `sample var (seconds^2)` = var(n_samples) / 25^2,
+    `sample sd (seconds)` = sd(n_samples) / 25) %>%
+  mutate(
+    `lambda (samples)` = exp(coef(chosen_model)$cond$Participant$`(Intercept)`),
+    `lambda (seconds)` = `lambda (samples)`/ 25,
+    kappa = exp(fixef(chosen_model)$disp),
+    `model var (seconds^2)` = (`lambda (samples)` * (1 + `lambda (samples)` / kappa)) / 25^2,
+    `model sd (seconds)` = sqrt(`model var (seconds^2)`)
+  )
+
+pander(temp)
+```
+
