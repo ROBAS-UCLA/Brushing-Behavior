@@ -1,7 +1,7 @@
 Package: Brushing.Behavior
 Type: Package
 Title: Longitudinal Models of Toothbrushing Behavior
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: c(
     person(given = "Douglas Ezra",
            family = "Morrison",
