@@ -65,7 +65,7 @@ usethis::use_data(session_durations2, overwrite = TRUE)
 
 
 pressure_durations =
-  read_csv("inst/extdata/Duration of brushing with excessive pressure on each dental region.csv") %>%
+  read_csv("inst/extdata/Duration of excessive pressure brushing.csv") %>%
   pivot_longer(cols = all_of(to_pivot), names_to = "Region", values_to = "n_samples") %>%
   mutate(
     Surface = code1[substr(Region, 5,5)],
