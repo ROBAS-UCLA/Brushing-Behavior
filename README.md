@@ -1,6 +1,6 @@
 # Brushing-Behavior
 
-
+[![DOI](https://zenodo.org/badge/450214645.svg)](https://zenodo.org/badge/latestdoi/450214645)
 
 If you use this dataset or code please cite our paper:
 
