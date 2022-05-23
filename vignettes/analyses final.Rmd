@@ -27,7 +27,7 @@ library(magrittr)
 library(dplyr)
 library(tidyr)
 library(papeR)
-library(brushing.habits)
+library(Brushing.Behavior)
 library(lme4)
 library(plotly)
 library(pander)
@@ -134,6 +134,52 @@ region_chosen %>% format_ranef_table(comp = "cond", combine_stats = FALSE) %>% p
 ```{R}
 
 region_chosen %>% format_ranef_table(comp = "zi", combine_stats = FALSE) %>% pander()
+
+```
+
+### Coefficients of variation by participant and region
+
+```{r}
+
+temp = region_durations |> 
+  group_by(Participant, Region) |> 
+  dplyr::summarize(
+    mean = mean(`Duration (seconds)`),
+    sd = sd(`Duration (seconds)`),
+    CV = if_else(mean == 0 ,0, sd/mean),
+    summary = paste(round(mean,1),round(sd,1), round(CV, 2), collapse = ", ")
+  )
+
+temp2 = temp |> 
+  select(Participant, Region, CV) |> 
+  pivot_wider(values_from = c(CV),names_from = Region) 
+
+
+readr::write_csv(temp2, file = "inst/extdata/CVs.csv")
+temp2 |> pander()
+
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(temp, aes(x = CV)) + geom_histogram(fill = "lightgray", col = 'black') + theme_bw() + expand_limits(x = 0) + xlab(
+  latex2exp::TeX(
+    r"($\frac{sd(duration)}{mean(duration)}$ by participant and region)")) +
+  ggtitle("Histogram of Coefficients of Variation for\nbrushing duration by participant and region")
+
+```
+
+
+### Histograms of brushing durations by participant and region
+
+```{r}
+
+library(ggplot2)
+ggplot(region_durations, aes(x = `Duration (seconds)`)) + 
+  facet_grid(rows = vars(Region), cols = vars(Participant)) +
+  geom_histogram(fill = "lightgray", col = 'black') + theme_bw() + expand_limits(x = 0)
+  
 
 ```
 

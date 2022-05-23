@@ -1,5 +1,3 @@
-## code to prepare `load_data` dataset goes here
-
 library(readr)
 library(dplyr)
 library(tidyr)
