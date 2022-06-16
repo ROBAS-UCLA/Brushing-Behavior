@@ -7,6 +7,7 @@
 #' @return
 #' @export
 #'
+#' @importFrom broom.mixed tidy
 format_ranef_table = function(model, comp = "cond", combine_stats = TRUE)
 {
   to_return = model %>%
