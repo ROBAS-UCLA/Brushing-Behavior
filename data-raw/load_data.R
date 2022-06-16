@@ -1,10 +1,10 @@
 library(readr)
 library(dplyr)
 library(tidyr)
-region_durations = read_csv("inst/extdata/Duration of brushing of each dental region.csv")
+region_durations = read_csv("inst/extdata/Duration-of-brushing-of-each-dental-region.csv")
 
 
-session_durations = read_csv("inst/extdata/Non effective brushing duration.csv")
+session_durations = read_csv("inst/extdata/Non-effective-brushing-duration.csv")
 colnames(session_durations) = c("Participant", "Session", "Session duration (samples)")
 
 library(magrittr)
@@ -65,7 +65,7 @@ usethis::use_data(session_durations2, overwrite = TRUE)
 
 
 pressure_durations =
-  read_csv("inst/extdata/Duration of excessive pressure brushing.csv") %>%
+  read_csv("inst/extdata/Duration-of-excessive-pressure-brushing.csv") %>%
   pivot_longer(cols = all_of(to_pivot), names_to = "Region", values_to = "n_samples") %>%
   mutate(
     Surface = code1[substr(Region, 5,5)],
