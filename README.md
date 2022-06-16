@@ -2,6 +2,7 @@
 
   <!-- badges: start -->
   [![R-CMD-check](https://github.com/ROBAS-UCLA/Brushing-Behavior/workflows/R-CMD-check/badge.svg)](https://github.com/ROBAS-UCLA/Brushing-Behavior/actions)
+  [![DOI](https://zenodo.org/badge/450214645.svg)](https://zenodo.org/badge/latestdoi/450214645)
   <!-- badges: end -->
 
 If you use this dataset or code please cite our paper:
