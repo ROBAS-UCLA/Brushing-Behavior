@@ -1,11 +1,10 @@
 ---
-title: "Brushing model 1"
-output:
-  word_document: default
-  pdf_document: default
-  html_document: default
-editor_options:
-  chunk_output_type: console
+title: "paper-analyses"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{paper-analyses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
