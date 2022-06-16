@@ -4,7 +4,9 @@
 #'
 #' @return
 #' @export
-#'
+#' @importFrom magrittr %>% %<>%
+#' @import dplyr
+
 
 format_fixef_table = function(model, type = "cond")
 {

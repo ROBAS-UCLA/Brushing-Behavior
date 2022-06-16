@@ -2,3 +2,6 @@
 
 export(format_fixef_table)
 export(format_ranef_table)
+import(dplyr)
+importFrom(magrittr,"%<>%")
+importFrom(magrittr,"%>%")

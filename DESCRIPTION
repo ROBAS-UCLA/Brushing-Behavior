@@ -28,7 +28,9 @@ Depends:
     R (>= 2.10)
 RoxygenNote: 7.2.0
 Imports: 
+    dplyr,
     glmmTMB (>= 1.1.2.3),
+    magrittr,
     parameters (>= 0.15.0.1)
 Remotes: 
     easystats/parameters
