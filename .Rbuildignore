@@ -3,3 +3,4 @@
 ^data-raw$
 ^LICENSE\.md$
 Matlab_codes
+^\.github$
