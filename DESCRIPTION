@@ -17,7 +17,8 @@ Description: This is a publically available version of the analyses described in
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
-URL: https://github.com/ROBAS-UCLA/Brushing-Behavior
+URL: https://github.com/ROBAS-UCLA/Brushing-Behavior,
+    https://robas-ucla.github.io/Brushing-Behavior/
 BugReports: https://github.com/ROBAS-UCLA/Brushing-Behavior/issues
 Suggests: 
     knitr,

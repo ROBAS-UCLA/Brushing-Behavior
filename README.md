@@ -1,6 +1,9 @@
 # Brushing-Behavior
 
-[![DOI](https://zenodo.org/badge/450214645.svg)](https://zenodo.org/badge/latestdoi/450214645)
+  <!-- badges: start -->
+  [![R-CMD-check](https://github.com/ROBAS-UCLA/Brushing-Behavior/workflows/R-CMD-check/badge.svg)](https://github.com/ROBAS-UCLA/Brushing-Behavior/actions)
+  [![DOI](https://zenodo.org/badge/450214645.svg)](https://zenodo.org/badge/latestdoi/450214645)
+  <!-- badges: end -->
 
 If you use this dataset or code please cite our paper:
 
@@ -10,6 +13,8 @@ Essalat, M., Morrison, D., Kak, S., Chang, E. J., Penso, I. R., Kulchar, R. J., 
 
 ``` r 
 install.packages("devtools")
+devtools::dev_sitrep() # make sure R package development setup is functional
+usethis::git_sitrep() # make sure git setup is functional
 devtools::install_github("ROBAS-UCLA/Brushing-Behavior")
 
 ```
