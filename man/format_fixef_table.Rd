@@ -4,13 +4,10 @@
 \alias{format_fixef_table}
 \title{Title}
 \usage{
-format_fixef_table(data)
+format_fixef_table(model, type = "cond")
 }
 \arguments{
 \item{data}{}
-}
-\value{
-
 }
 \description{
 Title

@@ -9,9 +9,6 @@ format_ranef_table(model, comp = "cond", combine_stats = TRUE)
 \arguments{
 \item{combine_stats}{}
 }
-\value{
-
-}
 \description{
 Title
 }
