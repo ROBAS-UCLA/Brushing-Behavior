@@ -1,0 +1,10 @@
+pandoc: 2.7.3
+pkgdown: 2.0.4
+pkgdown_sha: ~
+articles:
+  paper-analyses: paper-analyses.html
+last_built: 2022-06-17T01:02Z
+urls:
+  reference: https://robas-ucla.github.io/Brushing-Behavior/reference
+  article: https://robas-ucla.github.io/Brushing-Behavior/articles
+
