@@ -1,10 +1,13 @@
 #' Title
 #'
-#' @param data
+#' @param model input model
+#' @param type type of parameters to export
 #'
-#' @return
+#' @return a tibble
 #' @export
-#'
+#' @importFrom magrittr %>% %<>%
+#' @import dplyr
+
 
 format_fixef_table = function(model, type = "cond")
 {

@@ -3,17 +3,19 @@ Type: Package
 Title: Longitudinal Models of Toothbrushing Behavior
 Version: 1.0.0
 Authors@R: c(
-    person(given = "Douglas Ezra",
-           family = "Morrison",
-           role = c("aut"),
-           email = "demorrison@ucdavis.edu",
-           comment = c(ORCID = "0000-0002-7195-830X")),
     person(given = "Ramin",
            family = "Essalat",
            email = "mahmoudessalat@ucla.edu",
-           role = c("aut", "cre")))
+           comment = c(ORCID = "0000-0002-3807-4473"),
+           role = c("aut", "cre")),
+   person(given = "Douglas Ezra",
+           family = "Morrison",
+           role = c("aut"),
+           email = "demorrison@ucdavis.edu",
+           comment = c(ORCID = "0000-0002-7195-830X"))
+    )
 Maintainer: Ramin Essalat <mahmoudessalat@ucla.edu>
-Description: This is a publically available version of the analyses described in in Essalat, M., Morrison, D., Kak, S., Chang, E. J., Penso, I. R., Kulchar, R. J., Padilla, O. H. M., & Shetty, V. (2022). A naturalistic study of brushing patterns using powered toothbrushes. In T. Chaubal (Ed.), PLOS ONE (Vol. 17, Issue 5, p. e0263638). Public Library of Science (PLoS). https://doi.org/10.1371/journal.pone.0263638Essalat, M., Morrison, D., Kak, S., Chang, E. J., Penso, I. R., Kulchar, R. J., Padilla, O. H. M., & Shetty, V. (2022). A naturalistic study of brushing patterns using powered toothbrushes. In T. Chaubal (Ed.), PLOS ONE (Vol. 17, Issue 5, p. e0263638). Public Library of Science (PLoS). https://doi.org/10.1371/journal.pone.0263638
+Description: This is a publicly available version of the analyses described in in Essalat, M., Morrison, D., Kak, S., Chang, E. J., Penso, I. R., Kulchar, R. J., Padilla, O. H. M., & Shetty, V. (2022). A naturalistic study of brushing patterns using powered toothbrushes. In T. Chaubal (Ed.), PLOS ONE (Vol. 17, Issue 5, p. e0263638). Public Library of Science (PLoS). https://doi.org/10.1371/journal.pone.0263638Essalat, M., Morrison, D., Kak, S., Chang, E. J., Penso, I. R., Kulchar, R. J., Padilla, O. H. M., & Shetty, V. (2022). A naturalistic study of brushing patterns using powered toothbrushes. In T. Chaubal (Ed.), PLOS ONE (Vol. 17, Issue 5, p. e0263638). Public Library of Science (PLoS). https://doi.org/10.1371/journal.pone.0263638
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -21,15 +23,24 @@ URL: https://github.com/ROBAS-UCLA/Brushing-Behavior,
     https://robas-ucla.github.io/Brushing-Behavior/
 BugReports: https://github.com/ROBAS-UCLA/Brushing-Behavior/issues
 Suggests: 
+    bbmle,
+    ggplot2,
     knitr,
-    rmarkdown
+    latex2exp,
+    pander,
+    papeR,
+    plotly,
+    rmarkdown,
+    sjPlot
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Imports: 
+    broom.mixed,
+    dplyr,
     glmmTMB (>= 1.1.2.3),
+    magrittr,
     parameters (>= 0.15.0.1)
 Remotes: 
-    easystats/parameters,
-    glmmTMB/glmmTMB/glmmTMB
+    easystats/parameters

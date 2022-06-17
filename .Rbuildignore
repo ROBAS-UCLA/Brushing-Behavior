@@ -7,3 +7,4 @@ Matlab_codes
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^CITATION\.cff$

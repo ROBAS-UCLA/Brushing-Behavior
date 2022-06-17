@@ -7,10 +7,14 @@
 format_ranef_table(model, comp = "cond", combine_stats = TRUE)
 }
 \arguments{
-\item{combine_stats}{}
+\item{model}{input model}
+
+\item{comp}{component to analyze}
+
+\item{combine_stats}{whether to combine statistics}
 }
 \value{
-
+a tibble
 }
 \description{
 Title

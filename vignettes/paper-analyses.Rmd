@@ -1,11 +1,10 @@
 ---
-title: "Brushing model 1"
-output:
-  word_document: default
-  pdf_document: default
-  html_document: default
-editor_options:
-  chunk_output_type: console
+title: "paper-analyses"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{paper-analyses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -155,7 +154,7 @@ temp2 = temp |>
   pivot_wider(values_from = c(CV),names_from = Region) 
 
 
-readr::write_csv(temp2, file = "inst/extdata/CVs.csv")
+# readr::write_csv(temp2, file = "inst/extdata/CVs.csv")
 temp2 |> pander()
 
 ```

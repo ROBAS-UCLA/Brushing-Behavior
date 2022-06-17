@@ -4,13 +4,15 @@
 \alias{format_fixef_table}
 \title{Title}
 \usage{
-format_fixef_table(data)
+format_fixef_table(model, type = "cond")
 }
 \arguments{
-\item{data}{}
+\item{model}{input model}
+
+\item{type}{type of parameters to export}
 }
 \value{
-
+a tibble
 }
 \description{
 Title

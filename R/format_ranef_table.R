@@ -1,12 +1,13 @@
 #' Title
 #'
-#' @param comp
-#' @param model
-#' @param combine_stats
+#' @param comp component to analyze
+#' @param model input model
+#' @param combine_stats whether to combine statistics
 #'
-#' @return
+#' @return a tibble
 #' @export
 #'
+#' @importFrom broom.mixed tidy
 format_ranef_table = function(model, comp = "cond", combine_stats = TRUE)
 {
   to_return = model %>%
