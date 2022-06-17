@@ -25,6 +25,7 @@ BugReports: https://github.com/ROBAS-UCLA/Brushing-Behavior/issues
 Suggests: 
     knitr,
     papeR,
+    plotly,
     rmarkdown
 VignetteBuilder: knitr
 Depends: 
