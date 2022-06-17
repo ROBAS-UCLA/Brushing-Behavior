@@ -26,6 +26,7 @@ Suggests:
     bbmle,
     ggplot2,
     knitr,
+    latex2exp,
     pander,
     papeR,
     plotly,
