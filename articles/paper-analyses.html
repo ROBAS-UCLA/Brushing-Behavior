@@ -90,10 +90,6 @@
 <div class="section level3">
 <h3 id="parameter-estimates">Parameter estimates:<a class="anchor" aria-label="anchor" href="#parameter-estimates"></a>
 </h3>
-<pre><code><span class="co">## Cannot compute standard errors and confidence intervals for random</span>
-<span class="co">##   effects parameters.</span>
-<span class="co">##   Your model may suffer from singularity (see '?lme4::isSingular' and</span>
-<span class="co">##   '?performance::check_singularity').</span></code></pre>
 <table class="table">
 <caption># Fixed Effects (Count Model)</caption>
 <thead><tr class="header">
@@ -354,44 +350,44 @@
 <td align="center">-0.63</td>
 </tr>
 <tr class="odd">
-<td align="left">Cor (SurfaceLingual~JawMaxillar: Participant)</td>
-<td align="center">-0.27</td>
+<td align="left">Cor (SurfaceLingual~SurfaceOcclusal: Participant)</td>
+<td align="center">-0.03</td>
 </tr>
 <tr class="even">
-<td align="left">Cor (SurfaceOcclusal~JawMaxillar: Participant)</td>
-<td align="center">0.24</td>
+<td align="left">Cor (SurfaceLingual~JawMaxillar: Participant)</td>
+<td align="center">-0.27</td>
 </tr>
 <tr class="odd">
 <td align="left">Cor (SurfaceLingual~SideAnterior: Participant)</td>
 <td align="center">0.53</td>
 </tr>
 <tr class="even">
-<td align="left">Cor (SurfaceOcclusal~SideAnterior: Participant)</td>
-<td align="center">-0.21</td>
-</tr>
-<tr class="odd">
-<td align="left">Cor (JawMaxillar~SideAnterior: Participant)</td>
-<td align="center">-0.66</td>
-</tr>
-<tr class="even">
 <td align="left">Cor (SurfaceLingual~SideLeft: Participant)</td>
 <td align="center">0.56</td>
+</tr>
+<tr class="odd">
+<td align="left">Cor (SurfaceOcclusal~JawMaxillar: Participant)</td>
+<td align="center">0.24</td>
+</tr>
+<tr class="even">
+<td align="left">Cor (SurfaceOcclusal~SideAnterior: Participant)</td>
+<td align="center">-0.21</td>
 </tr>
 <tr class="odd">
 <td align="left">Cor (SurfaceOcclusal~SideLeft: Participant)</td>
 <td align="center">-0.34</td>
 </tr>
 <tr class="even">
+<td align="left">Cor (JawMaxillar~SideAnterior: Participant)</td>
+<td align="center">-0.66</td>
+</tr>
+<tr class="odd">
 <td align="left">Cor (JawMaxillar~SideLeft: Participant)</td>
 <td align="center">-0.41</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Cor (SideAnterior~SideLeft: Participant)</td>
 <td align="center">0.61</td>
-</tr>
-<tr class="even">
-<td align="left">Cor (SurfaceLingual~SurfaceOcclusal: Participant)</td>
-<td align="center">-0.03</td>
 </tr>
 </tbody>
 </table>
@@ -1223,8 +1219,8 @@
 <div class="section level4">
 <h4 id="coefficients-of-variation-by-participant-and-region">Coefficients of variation by participant and region<a class="anchor" aria-label="anchor" href="#coefficients-of-variation-by-participant-and-region"></a>
 </h4>
-<pre><code><span class="co">## `summarise()` has grouped output by 'Participant'. You can override using the</span>
-<span class="co">## `.groups` argument.</span></code></pre>
+<pre><code><span><span class="co">## `summarise()` has grouped output by 'Participant'. You can override using the</span></span>
+<span><span class="co">## `.groups` argument.</span></span></code></pre>
 <table class="table">
 <colgroup>
 <col width="9%">
@@ -1495,13 +1491,13 @@
 </tr>
 </tbody>
 </table>
-<pre><code><span class="co">## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></code></pre>
+<pre><code><span><span class="co">## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre>
 <p><img src="paper-analyses_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 </div>
 <div class="section level4">
 <h4 id="histograms-of-brushing-durations-by-participant-and-region">Histograms of brushing durations by participant and region<a class="anchor" aria-label="anchor" href="#histograms-of-brushing-durations-by-participant-and-region"></a>
 </h4>
-<pre><code><span class="co">## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></code></pre>
+<pre><code><span><span class="co">## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre>
 <p><img src="paper-analyses_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 </div>
 </div>
@@ -1623,27 +1619,32 @@
 </tbody>
 </table>
 <table class="table">
-<caption># Random Effects Variances</caption>
+<caption># Dispersion</caption>
 <thead><tr class="header">
 <th align="left">Parameter</th>
 <th align="center">Coefficient</th>
 <th align="center">95% CI</th>
 </tr></thead>
+<tbody><tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="center">2.06</td>
+<td align="center">(1.30, 3.27)</td>
+</tr></tbody>
+</table>
+<table class="table">
+<caption># Random Effects Variances</caption>
+<thead><tr class="header">
+<th align="left">Parameter</th>
+<th align="center">Coefficient</th>
+</tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">SD (Intercept: <a href="Session:Participant" class="uri">Session:Participant</a>)</td>
 <td align="center">0.27</td>
-<td align="center">(0.08, 0.87)</td>
 </tr>
 <tr class="even">
 <td align="left">SD (Intercept: Participant)</td>
 <td align="center">0.38</td>
-<td align="center">(0.16, 0.92)</td>
-</tr>
-<tr class="odd">
-<td align="left">SD (Residual)</td>
-<td align="center">2.06</td>
-<td align="center">(1.30, 3.27)</td>
 </tr>
 </tbody>
 </table>
@@ -1652,18 +1653,15 @@
 <thead><tr class="header">
 <th align="left">Parameter</th>
 <th align="center">Coefficient</th>
-<th align="center">95% CI</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">SD (Intercept: <a href="Session:Participant" class="uri">Session:Participant</a>)</td>
 <td align="center">0.69</td>
-<td align="center">(0.40, 1.19)</td>
 </tr>
 <tr class="even">
 <td align="left">SD (Intercept: Participant)</td>
 <td align="center">2.39</td>
-<td align="center">(1.25, 4.57)</td>
 </tr>
 </tbody>
 </table>
@@ -2379,7 +2377,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
     </footer>
