@@ -3,7 +3,7 @@ pkgdown: 2.0.5
 pkgdown_sha: ~
 articles:
   paper-analyses: paper-analyses.html
-last_built: 2022-07-01T23:07Z
+last_built: 2022-07-01T23:13Z
 urls:
   reference: https://robas-ucla.github.io/Brushing-Behavior/reference
   article: https://robas-ucla.github.io/Brushing-Behavior/articles
